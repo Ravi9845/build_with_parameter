@@ -1,0 +1,166 @@
+if (ReleaseBranch.contains("acc-")) {
+	return["United_States", "CapeTown"]
+}
+else {
+	return["United_States","London","European_Union","Sydney"]
+}
+================================
+
+if (ReleaseBranch.contains("acc-")) {
+	switch (LZ) {
+		case "United_States":
+			return ["us-east-2"]
+			break
+		case "CapeTown":
+			return ["af-south-1"]
+				break
+	}
+}
+else {
+	switch (LZ) {
+		case "United_States":
+			return ["us-east-1"]
+			break
+		case "London":
+			return ["eu-west-2"]
+			break
+		case "European_Union":
+			return ["eu-central-1"]
+			break
+		case "Sydney":
+			return ["ap-southeast-2"]
+			break
+	}
+}
+================================================================
+
+switch (AWS_DEPLOYMENT_REGION) {
+	case "us-east-1":
+		return ["DEV", "RC1", "CQA", "PRD", "NTWKSVC", "CRFSDEV", "CRSDEV"]
+		break
+	case "eu-west-2":
+		return ["CQA", "PRD", "NTWKSVC", "CRFSDEV"]
+		break
+	case "eu-central-1":
+		return ["CQA", "PRD", "NTWKSVC", "CRFSDEV"]
+		break
+	case "ap-southeast-2":
+		return ["CQA", "PRD", "NTWKSVC", "CRFSDEV"]
+		break
+	case "us-east-2":
+		return ["DEV", "RC1", "CRFSDEV"]
+		break
+    case "af-south-1":
+		return ["CQA", "PRD", "NTWKSVC"]
+		break
+}
+=============================================================
+
+switch (LZ) {
+   case 'United_States':
+     server_tag = 'd-server-02542pedsm3j3j'
+     break
+   case 'London':
+     server_tag = 'd-server-00r6ki3rcdw9e3'
+     break
+   case 'European_Union':
+     server_tag = 'd-server-02npce8a7tb1j0'
+     break
+}
+switch(LZ){
+case 'United_States':
+    extension = '.com'
+    break
+case 'European_Union':
+    extension = '.eu'
+    break
+case 'London':
+    extension = '.co.uk'
+    break
+case 'Sydney':
+    extension = '.au'
+    break
+case 'CapeTown':
+    extension = '.co.za'
+    break
+ }
+ if (IsTenantPrivateLinkEnabled != 'No'){
+    tenantpvtlinktgarn= "Please populate target group arn for bpocloud-${TenantName}-TG-pvtlink"
+  }
+  else{
+    tenantpvtlinktgarn= "This field is not relevant when IsTenantPrivateLinkEnabled is No"
+  }
+ if (Action != 'Delete') {
+   param_map = [
+     ["parameter": "ClusterName", "default_value":"dm"],
+     ["parameter": "Namespace", "default_value":"dm"],
+     ["parameter": "appname", "default_value":"bpocloud"],
+     ["parameter": "taskcpu", "default_value":"1024"],
+     ["parameter": "taskmemory","default_value":"2048"],
+     ["parameter": "executionrole","default_value":"customer_ecs_custom_role"],
+     ["parameter": "taskrole","default_value":"customer_ecs_custom_role"],
+     ["parameter": "efsid", "default_value":"fs-0fb45effbaa3e3706"],
+     ["parameter": "tenantname","default_value":"${TenantName}"],
+     ["parameter": "image","default_value":"623137734333.dkr.ecr.${AWS_DEPLOYMENT_REGION}.amazonaws.com/bpo-service:latest"],
+     ["parameter": "tenantdbhost","default_value":"db.cqa.debtmanager.crsoftwarecloud${extension}"],
+     ["parameter": "envname", "default_value":"${STAGE.toLowerCase()}"],
+     ["parameter": "containermemoryreservation", "default_value": "512"],
+     ["parameter": "sslenable", "default_value": "true"],
+     ["parameter": "sslport", "default_value": "8443"],
+     ["parameter": "tenantdns", "default_value":"${TenantName}.${STAGE.toLowerCase()}.debtmanager.crsoftwarecloud${extension}"],
+     ["parameter": "RoutingPath", "default_value": "/bpo-service*"],
+     ["parameter": "listenerrulenumber", "default_value":"15"],
+     ["parameter": "UpdatePvtLinkTG", "default_value":"${IsTenantPrivateLinkEnabled}"],
+     ["parameter": "bpotenantpvtlinktgarn", "default_value":"${tenantpvtlinktgarn}"],
+     ["parameter": "sslkeyalias", "default_value":"tomcat"],
+     ["parameter": "dbname", "default_value":"dev_tenant_admin"]
+     ]
+   html_to_be_rendered = "<table><tr>"
+   param_list = param_map
+   param_list.each { action ->
+     html_to_be_rendered = """
+       ${html_to_be_rendered}
+       <tr>
+       <td>
+       <label title=\"${action.parameter}\" class=\" \">${action.parameter}</label>
+       <input type=\"hidden\" class=\" \" name=\"value\" value=${action.parameter}>
+       </td>
+       <td>
+       <input type=\"text\" class=\" \"  size=\"50\" name=\"value\" value=\"${action.default_value}\" > </br>
+       </td>
+       </tr>
+     """
+   }
+   html_to_be_rendered = "${html_to_be_rendered}</tr></table>"
+   return html_to_be_rendered
+ }
+ else {
+   return "No RFC Information required for Delete Action"
+ }
+=================================================================================
+if (Action != 'Delete') {
+  param_map = [
+    ["parameter": "Application", "default_value": "bpocloud" ]
+  ]
+  html_to_be_rendered = "<table><tr>"
+  param_list = param_map
+  param_list.each { action ->
+    html_to_be_rendered = """
+      ${html_to_be_rendered}
+      <tr>
+      <td>
+      <label title=\"${action.parameter}\" class=\" \">${action.parameter}</label>
+      <input type=\"hidden\" class=\" \" name=\"value\" value=${action.parameter}>
+      </td>
+      <td>
+      <input type=\"text\" class=\" \"  size=\"50\" name=\"value\" value=\"${action.default_value}\" > </br>
+      </td>
+      </tr>
+  """
+  }
+  html_to_be_rendered = "${html_to_be_rendered}</tr></table>"
+  return html_to_be_rendered
+}
+else {
+  return "RFCTags are not required for Actions other than Create"
+}
